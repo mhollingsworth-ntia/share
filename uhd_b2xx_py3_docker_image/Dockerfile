@@ -6,17 +6,21 @@ ARG UHD_TAG=4.1.0.5
 RUN apt-get update -q && \
     DEBIAN_FRONTEND=noninteractive \
                    apt-get install -qy --no-install-recommends \
-                   wget libboost-all-dev libusb-1.0-0-dev python3-setuptools \
+                   wget libboost-all-dev libusb-dev libusb-1.0-0 libusb-1.0-0-dev python3-setuptools \
                    python3-pip python3-setuptools python3-numpy \
                    python3-mako python3-requests \
-                   cmake build-essential ca-certificates
+                   cmake build-essential ca-certificates \
+                   autoconf automake ccache cpufrequtils \
+                   doxygen ethtool g++ git inetutils-tools \
+                   libncurses5 libncurses5-dev python3-dev \
+                   python3-scipy python3-ruamel.yaml
 
 RUN wget https://github.com/EttusResearch/uhd/archive/refs/tags/v${UHD_TAG}.tar.gz \
     -O uhd.tar.gz && tar -xvzf uhd.tar.gz
 
 RUN mkdir uhd-${UHD_TAG}/host/build
 WORKDIR uhd-${UHD_TAG}/host/build
-RUN cmake -DENABLE_PYTHON_API=ON -DENABLE_PYTHON3=ON ../
+RUN cmake ../
 RUN make && make test && make install
 RUN python3 /usr/local/lib/uhd/utils/uhd_images_downloader.py
 
